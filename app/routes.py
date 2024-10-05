@@ -70,3 +70,27 @@ def logout():
     logout_user()
     flash("You have been logged out.", "info")
     return redirect(url_for("main.home"))
+
+@app.route('/history')
+def history():
+    user_predictions = Prediction.query.filter_by(user_id=current_user.id).all()
+    return render_template('history.html', predictions=user_predictions)
+
+from datetime import datetime
+@app.route('/predict', methods=['POST'])
+def predict():
+    if request.method == 'POST':
+        input_data = request.form.to_dict()  # Get user input data
+        prediction = model.predict([list(input_data.values())])  # Run ML prediction
+        result = 'Cancerous' if prediction[0] == 1 else 'Non-Cancerous'
+        
+        # Store in database
+        new_prediction = Prediction(
+            user_id=current_user.id,  # Assuming having current_user from Flask-Login (which not been added yet)
+            input_data=str(input_data),
+            prediction_result=result
+        )
+        db.session.add(new_prediction)
+        db.session.commit()
+
+        return render_template('result.html', prediction=result)
