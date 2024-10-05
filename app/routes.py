@@ -86,7 +86,7 @@ def predict():
         
         # Store in database
         new_prediction = Prediction(
-            user_id=current_user.id,  # Assuming you have current_user from Flask-Login
+            user_id=current_user.id,  # Assuming having current_user from Flask-Login (which not been added yet)
             input_data=str(input_data),
             prediction_result=result
         )
